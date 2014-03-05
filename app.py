@@ -47,6 +47,40 @@ def call():
     # Return a message indicating the call is coming
     return 'Call inbound!'
 
+@app.route('/incoming/sms', methods=['POST', 'GET'])
+def sms():
+    response = twiml.Response()
+    response.message("10 points to Ravenclaw and Slytherin! Huzzah!")
+    return Response(str(response), mimetype='text/xml')
+    
+
+@app.route('/incoming/call', methods=['POST', 'GET'])
+def responsetocall():
+    response = twiml.Response()
+    response.say("Tory and Ritchie are twilio pros!", voice="woman")
+    with response.gather(numDigits=1, action="/handle-key", method="POST") as g:
+        g.say("To give Ravenclaw 10 points, press 1. Press any other key to give Slitherin 10 points.", voice='woman')
+ 
+    # return str(resp)
+    return Response(str(response), mimetype='text/xml')
+
+
+@app.route("/handle-key", methods=['GET', 'POST'])
+def handle_key():
+    """Handle key press from a user."""
+ 
+    # Get the digit pressed by the user
+    digit_pressed = request.values.get('Digits', None)
+    if digit_pressed == "1":
+        response = twiml.Response()
+        response.say("10 points to Ravenclaw! Yay, Tory!", voice='woman')
+        return str(response)
+ 
+    else:
+        resp = twiml.Response()
+        resp.say("10 points to Slitherin! Yay, Ritchie!", voice='woman')
+        return str(resp)
+
 # Generate TwiML instructions for an outbound call
 @app.route('/hello')
 def hello():
